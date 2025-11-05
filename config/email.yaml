@@ -1,0 +1,29 @@
+# Configurações do Servidor SMTP para envio de e-mails de notificação.
+# PREENCHA COM SUAS CREDENCIAIS REAIS
+
+smtp:
+  server: seu_servidor_smtp.com # Ex: smtp.gmail.com
+  port: 587 # Ou 465 para SSL
+  username: seu_email@dominio.com
+  password: sua_senha_ou_app_password
+  sender_email: seu_email@dominio.com # Email que aparecerá como remetente
+
+# Configurações de notificação
+notification:
+  subject_template: "[RD Serviços] Pedido #PEDIDO_ID - Status Atualizado"
+  body_template: |
+    Prezado(a) Cliente,
+
+    Informamos que o status do seu pedido foi atualizado.
+
+    Detalhes do Pedido:
+    - ID do Pedido: #PEDIDO_ID
+    - Serviço: #SERVICO
+    - Status Anterior: #STATUS_ANTERIOR
+    - Novo Status: #NOVO_STATUS
+    - Data da Mudança: #DATA_MUDANCA
+
+    Acompanhe o andamento do seu pedido.
+
+    Atenciosamente,
+    Equipe RD Serviços

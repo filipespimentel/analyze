@@ -1,0 +1,34 @@
+IRPF:
+  title: Imposto de Renda
+  description: Formulário para envio de documentos para a declaração de Imposto de Renda.
+  allowed_types:
+    - pdf
+    - xlsx
+    - csv
+  fields:
+    - name: nome
+      label: Nome Completo
+      type: text
+      required: true
+    - name: cpf
+      label: CPF (somente números)
+      type: text
+      required: true
+    - name: ano
+      label: Ano de Referência
+      type: select
+      options: [2025, 2024, 2023, 2022]
+      required: true
+
+BI:
+  title: Análise de Dados
+  description: Formulário para descrição do pedido e envio de bases de dados (planilhas).
+  allowed_types:
+    - csv
+    - xlsx
+  fields:
+    - name: descricao
+      label: Descrição do Pedido
+      type: textarea
+      required: true
+
