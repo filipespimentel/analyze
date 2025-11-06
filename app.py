@@ -1,77 +1,80 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
+from yaml.loader import SafeLoader
 from pathlib import Path
 
-# Caminhos
-CONFIG_PATH = Path("config/services.yaml")
-CREDENTIALS_PATH = Path("config/credentials.yaml")
-UPLOADS_DIR = Path("data/uploads")
+# Caminhos dos arquivos
+CONFIG_PATH = Path("config/credentials.yaml")
+SERVICES_PATH = Path("config/services.yaml")
 
-# Funções auxiliares
-def load_config():
-    if not CONFIG_PATH.exists():
-        st.error(f"Arquivo não encontrado: {CONFIG_PATH}")
+# Função: Carregar configurações YAML
+def load_yaml(path):
+    if not path.exists():
+        st.error(f"Arquivo não encontrado: {path}")
         return {}
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+    with open(path, "r", encoding="utf-8") as file:
+        return yaml.load(file, Loader=SafeLoader)
 
-def load_credentials():
-    if not CREDENTIALS_PATH.exists():
-        st.error(f"Arquivo não encontrado: {CREDENTIALS_PATH}")
-        return None
-    with open(CREDENTIALS_PATH, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+# Função: Páginas
+def pagina_irpf():
+    st.title("💰 Imposto de Renda (IRPF)")
+    st.write("Envie seus documentos e dados para a declaração anual de IRPF.")
+    st.file_uploader("Envie seus arquivos (PDF, JPG, DOCX, XLSX):", accept_multiple_files=True)
 
-def run_app(authenticator):
-    st.title("🧱 RD Serviços")
-    st.sidebar.subheader(f"Bem-vindo, {st.session_state['name']}")
-    if st.sidebar.button("Sair"):
-        authenticator.logout("Logout", "sidebar")
+def pagina_bi():
+    st.title("📊 Análise de Dados (BI)")
+    st.write("Envie planilhas e relatórios para criar painéis personalizados de Business Intelligence.")
+    st.file_uploader("Envie seus arquivos (CSV, XLSX, TXT):", accept_multiple_files=True)
 
-    services_config = load_config()
-    st.session_state["services_config"] = services_config
+def pagina_pedidos():
+    st.title("📦 Meus Pedidos")
+    st.write("Aqui você verá o histórico de serviços enviados.")
+    st.info("Nenhum pedido encontrado ainda.")
 
-    st.markdown("""
-    ### Portal de Serviços RD
-
-    Escolha o serviço desejado:
-
-    - 💰 **Imposto de Renda (IRPF)**
-    - 📊 **Análise de Dados (BI)**
-    - 📁 **Consultoria Contábil**
-    """)
-
+# Função principal
 def main():
-    st.set_page_config(page_title="RD Serviços", page_icon="🧱")
+    st.set_page_config(page_title="RD Serviços", page_icon="🧱", layout="wide")
 
     # Carregar credenciais
-    credentials_config = load_credentials()
-    if not credentials_config:
+    config = load_yaml(CONFIG_PATH)
+    if not config:
         return
 
-    # Configurar autenticação (modo compatível)
-    authenticator = stauth.Authenticate(
-        credentials_config["credentials"],
-        credentials_config["cookie"]["name"],
-        credentials_config["cookie"]["key"],
-        credentials_config["cookie"]["expiry_days"],
-        credentials_config.get("preauthorized")
-    )
+    # Criar autenticador (versão nova compatível)
+    authenticator = stauth.Authenticate.from_yaml(config)
 
-    # Login (sem 'location', compatível com versões antigas)
-    name, authentication_status, username = authenticator.login("Login", "main")
+    # Login
+    authenticator.login("main")
 
-    if authentication_status:
-        st.session_state["authentication_status"] = authentication_status
-        st.session_state["name"] = name
-        st.session_state["username"] = username
-        run_app(authenticator)
+    if st.session_state["authentication_status"]:
+        authenticator.logout("Sair", "sidebar")
+        st.sidebar.title(f"Bem-vindo, {st.session_state['name']} 👋")
 
-    elif authentication_status is False:
-        st.error("Nome de usuário ou senha incorretos.")
-    elif authentication_status is None:
-        st.warning("Por favor, insira suas credenciais.")
+        menu = st.sidebar.radio("Navegação", ["🏠 Início", "💰 Imposto de Renda", "📊 Análise de Dados", "📦 Meus Pedidos"])
+
+        if menu == "🏠 Início":
+            st.title("🧱 RD Serviços")
+            st.write("""
+            Bem-vindo à plataforma de serviços da **RD**.
+
+            Escolha uma das opções no menu lateral:
+            - 💰 Enviar documentos para **Imposto de Renda**
+            - 📊 Solicitar **Análise de Dados**
+            - 📦 Acompanhar **Meus Pedidos**
+            """)
+
+        elif menu == "💰 Imposto de Renda":
+            pagina_irpf()
+        elif menu == "📊 Análise de Dados":
+            pagina_bi()
+        elif menu == "📦 Meus Pedidos":
+            pagina_pedidos()
+
+    elif st.session_state["authentication_status"] is False:
+        st.error("Usuário ou senha incorretos.")
+    elif st.session_state["authentication_status"] is None:
+        st.warning("Por favor, insira seu nome de usuário e senha.")
 
 if __name__ == "__main__":
     main()
