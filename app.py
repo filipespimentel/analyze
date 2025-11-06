@@ -52,7 +52,7 @@ def main():
         initial_sidebar_state="collapsed",
     )
 
-    # 1️⃣ Carregar credenciais a partir do arquivo YAML
+    # 1️⃣ Carregar credenciais
     if not CREDENTIALS_PATH.exists():
         st.error("Arquivo de credenciais não encontrado em config/credentials.yaml")
         return
@@ -60,13 +60,25 @@ def main():
     with open(CREDENTIALS_PATH, "r", encoding="utf-8") as file:
         config = yaml.safe_load(file)
 
-    # 2️⃣ Criar autenticador usando o método atualizado (versão 0.3.x)
-    authenticator = stauth.Authenticate.from_yaml(config)
+    # 2️⃣ Detectar versão do streamlit-authenticator
+    authenticator = None
+    try:
+        # Tentativa com nova API (>=0.3.1)
+        authenticator = stauth.Authenticate.from_yaml(config)
+    except AttributeError:
+        # Fallback para versões antigas
+        st.warning("Usando modo compatível com versão antiga do streamlit-authenticator.")
+        credentials = config["credentials"]
+        cookie = config["cookie"]
+        authenticator = stauth.Authenticate(
+            credentials,
+            cookie["name"],
+            cookie["key"],
+            cookie["expiry_days"],
+        )
 
     # 3️⃣ Tela de login
-    name, authentication_status, username = authenticator.login(
-        "Login", location="main"
-    )
+    name, authentication_status, username = authenticator.login("Login", location="main")
 
     # 4️⃣ Fluxo de autenticação
     if authentication_status:
