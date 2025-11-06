@@ -1,40 +1,7 @@
 services:
   irpf:
-    name: "Imposto de Renda (IRPF)"
-    description: >
-      Envie seus documentos e informações para a elaboração da sua declaração anual
-      de Imposto de Renda de Pessoa Física.
-    upload_folder: "data/uploads/irpf"
-    allowed_extensions:
-      - pdf
-      - jpg
-      - png
-      - docx
-      - xlsx
-    active: true
-    icon: "💰"
-
+    name: "Imposto de Renda"
+    description: "Envio de documentos para declaração anual."
   bi:
-    name: "Análise de Dados (BI)"
-    description: >
-      Compartilhe suas bases de dados (planilhas, CSVs, relatórios) para receber
-      um painel de Business Intelligence personalizado para sua empresa.
-    upload_folder: "data/uploads/bi"
-    allowed_extensions:
-      - csv
-      - xlsx
-      - txt
-    active: true
-    icon: "📊"
-
-  contabilidade:
-    name: "Consultoria Contábil"
-    description: >
-      Envie documentos e relatórios contábeis para receber uma análise completa
-      com recomendações de otimização tributária e financeira.
-    upload_folder: "data/uploads/contabilidade"
-    allowed_extensions:
-      - pdf
-      - xlsx
-    active: false
-    icon: "📁"
+    name: "Análise de Dados"
+    description: "Criação de painéis e relatórios."
