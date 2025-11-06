@@ -63,12 +63,12 @@ def main():
         return
 
     # 2. Configurar o autenticador
-    authenticator = stauth.Authenticate(
-        credentials_config['credentials'],
-        credentials_config['cookie']['name'],
-        credentials_config['cookie']['key'],
-        credentials_config['cookie']['expiry_days'],
-        credentials_config['preauthorized']
+   authenticator = stauth.Authenticate(
+    credentials_config['credentials'],
+    credentials_config['cookie']['name'],
+    credentials_config['cookie']['key'],
+    credentials_config['cookie']['expiry_days']
+)
     )
 
     # 3. Exibir a tela de login
