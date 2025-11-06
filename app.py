@@ -18,31 +18,18 @@ def load_config():
         return yaml.safe_load(f)
 
 
-def load_credentials():
-    """Carrega as credenciais de usuários do arquivo YAML."""
-    if not CREDENTIALS_PATH.exists():
-        st.error(f"Arquivo de credenciais não encontrado: {CREDENTIALS_PATH}")
-        return None
-    with open(CREDENTIALS_PATH, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-
 def run_app(authenticator):
-    """Função que contém o conteúdo principal do aplicativo Streamlit."""
-
-    # Título principal
+    """Conteúdo principal do aplicativo após login."""
     st.title("🧱 RD Serviços")
 
-    # Carrega a configuração para garantir que as páginas sejam exibidas corretamente
+    # Carregar e armazenar configuração de serviços
     services_config = load_config()
     st.session_state["services_config"] = services_config
 
-    # Sidebar com boas-vindas e botão de logout
+    # Sidebar de boas-vindas e logout
     st.sidebar.subheader(f"Bem-vindo, {st.session_state['name']}")
-    if st.sidebar.button("Sair"):
-        authenticator.logout(location="sidebar")
+    authenticator.logout("Sair", location="sidebar")
 
-    # Conteúdo principal
     st.markdown(
         """
         Bem-vindo à plataforma de envio de documentos da **RD Serviços**.
@@ -52,7 +39,7 @@ def run_app(authenticator):
         - **Imposto de Renda (IRPF)**: Envie seus documentos para a declaração anual.
         - **Análise de Dados (BI)**: Descreva sua necessidade e envie suas bases de dados.
         
-        Seu envio será organizado e salvo localmente em `data/uploads/` para processamento futuro.
+        Seus envios serão organizados e salvos localmente em `data/uploads/` para processamento futuro.
         """
     )
 
@@ -65,34 +52,32 @@ def main():
         initial_sidebar_state="collapsed",
     )
 
-    # 1. Carregar credenciais
-    credentials_config = load_credentials()
-    if not credentials_config:
+    # 1️⃣ Carregar credenciais a partir do arquivo YAML
+    if not CREDENTIALS_PATH.exists():
+        st.error("Arquivo de credenciais não encontrado em config/credentials.yaml")
         return
 
-    # 2. Configurar o autenticador (versão atualizada)
-    authenticator = stauth.Authenticate(
-        credentials=credentials_config["credentials"],
-        cookie_name=credentials_config["cookie"]["name"],
-        key=credentials_config["cookie"]["key"],
-        cookie_expiry_days=credentials_config["cookie"]["expiry_days"],
-    )
+    with open(CREDENTIALS_PATH, "r", encoding="utf-8") as file:
+        config = yaml.safe_load(file)
 
-    # 3. Exibir a tela de login
+    # 2️⃣ Criar autenticador usando o método atualizado (versão 0.3.x)
+    authenticator = stauth.Authenticate.from_yaml(config)
+
+    # 3️⃣ Tela de login
     name, authentication_status, username = authenticator.login(
         "Login", location="main"
     )
 
+    # 4️⃣ Fluxo de autenticação
     if authentication_status:
-        # Usuário logado
         st.session_state["authentication_status"] = authentication_status
         st.session_state["name"] = name
         st.session_state["username"] = username
-
         run_app(authenticator)
 
     elif authentication_status is False:
         st.error("Nome de usuário ou senha incorretos")
+
     elif authentication_status is None:
         st.warning("Por favor, insira seu nome de usuário e senha")
 
