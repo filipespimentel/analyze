@@ -1,34 +1,40 @@
-IRPF:
-  title: Imposto de Renda
-  description: Formulário para envio de documentos para a declaração de Imposto de Renda.
-  allowed_types:
-    - pdf
-    - xlsx
-    - csv
-  fields:
-    - name: nome
-      label: Nome Completo
-      type: text
-      required: true
-    - name: cpf
-      label: CPF (somente números)
-      type: text
-      required: true
-    - name: ano
-      label: Ano de Referência
-      type: select
-      options: [2025, 2024, 2023, 2022]
-      required: true
+services:
+  irpf:
+    name: "Imposto de Renda (IRPF)"
+    description: >
+      Envie seus documentos e informações para a elaboração da sua declaração anual
+      de Imposto de Renda de Pessoa Física.
+    upload_folder: "data/uploads/irpf"
+    allowed_extensions:
+      - pdf
+      - jpg
+      - png
+      - docx
+      - xlsx
+    active: true
+    icon: "💰"
 
-BI:
-  title: Análise de Dados
-  description: Formulário para descrição do pedido e envio de bases de dados (planilhas).
-  allowed_types:
-    - csv
-    - xlsx
-  fields:
-    - name: descricao
-      label: Descrição do Pedido
-      type: textarea
-      required: true
+  bi:
+    name: "Análise de Dados (BI)"
+    description: >
+      Compartilhe suas bases de dados (planilhas, CSVs, relatórios) para receber
+      um painel de Business Intelligence personalizado para sua empresa.
+    upload_folder: "data/uploads/bi"
+    allowed_extensions:
+      - csv
+      - xlsx
+      - txt
+    active: true
+    icon: "📊"
 
+  contabilidade:
+    name: "Consultoria Contábil"
+    description: >
+      Envie documentos e relatórios contábeis para receber uma análise completa
+      com recomendações de otimização tributária e financeira.
+    upload_folder: "data/uploads/contabilidade"
+    allowed_extensions:
+      - pdf
+      - xlsx
+    active: false
+    icon: "📁"
