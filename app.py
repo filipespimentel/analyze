@@ -84,7 +84,8 @@ def main():
     )
 
     # 3️⃣ Exibir a tela de login
-    name, authentication_status, username = authenticator.login("Login", "main")
+name, authentication_status, username = authenticator.login("Login", location="main")
+
 
     if authentication_status:
         # Usuário logado
